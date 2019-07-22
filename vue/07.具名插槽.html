@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>07具名插槽</title>
+    <script src="../node_modules/vue/dist/vue.min.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+</body>
+<script>
+    Vue.component('myLi',{
+        template:  `<div>第一个slot插槽：<slot name="one"></slot>第二个slot插槽：<slot name="two"></slot></div>`,
+    });
+    // 
+    let App={
+        // 注：自定义组件的点击事件直接写@click可能不起作用，要加“.native”修饰符，表示原生点击事件
+        template:'<div><myLi @click.native="test"><h1 slot="one">name为one</h1><h2 slot="two">name为two</h2></myLi></div>',
+        methods: {
+            test() {
+                alert("点击了myLi");
+            },
+        }
+    };
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+
+            }
+        },
+        template: '<App></App>',
+        components: {App}
+    });
+</script>
+</html>

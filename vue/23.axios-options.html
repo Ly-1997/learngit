@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>23.axios-option</title>
+</head>
+<body>
+    <div id="app"></div>
+</body>
+<script src="../node_modules/vue/dist/vue.min.js"></script>
+<script src="./node_modules/axios/dist/axios.min.js"></script>
+<script>
+    Vue.prototype.$axios=axios; //将axios挂载到vue原型上，用this.$axios调用
+    
+    var App={
+        template: '<button @click="base64Code()">发送请求</button>',
+        methods: {
+            base64Code() {  //base64加密
+                // 定义字符串
+                var string = '1810768215@qq.com';
+                // 加密
+                var encodedString = Base64.encode(string);
+                console.log(encodedString); // 输出: "SGVsbG8gV29ybGQh"
+                // 解密
+                var decodedString = Base64.decode(encodedString);
+                console.log(decodedString); // 输出: "Hello World!"
+            },
+            postReq() {
+                this.$axios.defaults.baseURL='http://127.0.0.10:8888/';  //配置默认URL地址
+                this.$axios.get('',{
+                    params: {id:001,username: '啊啊啊'},
+                    // transformResponse    传递给then、catch前，允许修改响应数据
+                    transformResponse: [function (data) {
+                        // data.msg='change post answer msg';   //要想改变，得在return中之间改变才行
+                        // console.log(data);
+                        data=JSON.parse(data);
+                        // console.log(JSON.parse(data));
+                        return 'aaa=change post answer msg';     
+                    }],
+                    
+                })
+                .then(res=>{
+                    console.log(res.data.msg);  
+                })
+                .catch(err=>{
+                    console.log(err);
+                });
+
+                this.$axios.post('/add',{
+                    id: 007, 
+                    username: '哈哈哈'
+                },{
+                    // `transformRequest` 允许在向服务器发送前，修改请求数据
+                    // 只能用在 'PUT', 'POST' 和 'PATCH' 这几个请求方法
+                    // 后面数组中的函数必须返回一个字符串，或 ArrayBuffer，或 Stream
+                    transformRequest: [function (data) {
+                        console.log(data);
+                        return 'name=哈哈哈';    //必须有return返回
+                    }]
+                })
+                .then(res=>{
+                    console.log(res);
+                    
+                })
+                .catch(err=>{
+                    console.log(err);
+                    
+                });
+            },
+        }
+    }
+    new Vue({
+        el: '#app',
+        components: {
+            App
+        },
+        template:'<App />'
+    });
+</script>
+</html>

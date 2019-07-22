@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>13.给DOM元素添加事件的特殊情况</title>
+    <script src="../node_modules/vue/dist/vue.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <input type="text" v-show='isShow' ref="input">
+    </div>
+</body>
+<script>
+        // let App={
+        //     template: '<div ref="btn">这是App组件<span>哈哈哈，App组件</span></div>',
+        //     mounted() {
+        //         // 如果是个标签绑定ref属性，使用this.$refs.xxx获取的是原生js的DOM对象
+        //         console.log(this.$refs.btn);
+        //         console.log(this.$refs.app);
+                
+        //     },
+        // };
+        new Vue({
+            el: '#app',
+            // template: '<App ref="app">',
+            // components: {
+            //     App
+            // },
+            data() {
+                return {
+                    isShow: false,
+                }
+            },
+            mounted() {
+               this.isShow=true; 
+               console.log(this.$refs.input);
+            //    this.$refs.input.focus();
+               
+            // $nextTick是在DOM更新循环结束之后、执行延迟回调，在修改数据之后使用$nextTick可以在回调中获取到更新后的DOM
+               this.$nextTick(()=>{
+
+               this.$refs.input.focus();
+               console.log(this.$refs.input);
+               });
+            },
+        });
+    </script>
+</html>

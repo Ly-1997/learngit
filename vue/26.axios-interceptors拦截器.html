@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>26.axios-interceptors拦截器</title>
+</head>
+<body>
+    <div id="app"></div>
+</body>
+<script src="./node_modules/axios/dist/axios.min.js"></script>
+<script src="../node_modules/vue/dist/vue.min.js"></script>
+<script>
+    Vue.prototype.$axios=axios;
+    let App={
+        template:  `<button @click='postSeq'>发送请求</button>`,
+        methods: {
+            postSeq() { //发送请求
+                this.$axios.defaults.baseURL='http://127.0.0.1:8888/';
+                // 添加请求拦截器
+                this.$axios.interceptors.request.use((config)=> {
+                    // 在发送请求之前做些什么
+                    console.log(localStorage.getItem('token'));
+                    if (localStorage.getItem('token')) {
+                        config.headers={'token':localStorage.getItem('token')}; //这里的config是配置，相当于defaults
+                        // 配置会以一个优先顺序进行合并。这个顺序是：在 lib/defaults.js 找到的库的默认值，
+                        // 然后是实例的 defaults 属性，最后是请求的 config 参数。后者将优先于前者。这里是一个例子：
+                    }
+                    return config;
+                  }, function (error) {
+                    // 对请求错误做些什么
+                    return Promise.reject(error);
+                  });
+              
+                // 添加响应拦截器
+                this.$axios.interceptors.response.use((response)=> {
+                    // 对响应数据做点什么
+                    console.log(response.data.token);
+                    localStorage.setItem('token',response.data.token);  //第一次响应时取得token，并将token存入本地缓存
+                    return response;
+                  }, function (error) {
+                    // 对响应错误做点什么
+                    return Promise.reject(error);
+                  });
+                this.$axios.get('/',{})
+                .then()
+                .catch();
+            }
+        }
+    }
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+
+            }
+        },
+        template: '<App />',
+        components: {
+            App
+        }
+    });
+</script>
+</html>

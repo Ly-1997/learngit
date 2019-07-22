@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>21.axios的使用(1)</title>
+</head>
+<body>
+    <div id="app"></div>
+</body>
+<script src="../node_modules/vue/dist/vue.min.js"></script>
+<script src="./node_modules/axios/dist/axios.min.js"></script>
+<!-- <script src="./server/server.js"></script> -->
+<script>
+    /*  将axios挂载到Vue原型上，这样$axios在每个Vue实例上都可以使用
+        以$开头，$是在所有Vue实例中都可用的属性的一个简单约定，
+        这样可以避免和已定义的数据、方法、计算属性等发生冲突
+    */
+    Vue.prototype.$axios=axios;     
+    var App={
+        template: '<button @click="sendRequest()">发请求</button>',
+        methods: {
+            sendRequest() {
+                
+                // var p = new Promise(function(resolve, reject){
+                //     //用setTimeout模拟异步操作
+                //     setTimeout(function(){
+                //         console.log('第一个Promise执行完成');
+                //         resolve('第一个Promise');
+                //     }, 200);
+                // });
+                // console.log(p);
+                
+                // console.log(this.$axios);
+                // 使用axios get方法前，先在server目录下，打开cmd，启动一下服务器，  node server.js———>服务器启动在8888端口
+                this.$axios.get('http://127.0.0.1:8888/',{params:{a:1}})
+                .then(res=>{
+                    console.log(res);
+                    
+                    console.log(res.data);
+                })
+                .catch(err=>{
+                    console.log(err);
+                })
+
+                this.$axios.post('http://127.0.0.1:8888/add',{'a': 1,'b': 2})
+                .then(res=>{
+                    console.log(res);
+                    console.log(res.data);
+                    
+                })
+                .catch(err=>{
+                    console.log(err);
+                });
+            }
+        }
+    }
+    new Vue({
+        el: '#app',
+        components: {
+            App
+        },
+        template: '<App />',
+        data() {
+            return {
+
+            }
+        },
+        
+    });
+</script>
+</html>

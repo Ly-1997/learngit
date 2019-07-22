@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>12.vue获取DOM元素</title>
+    <script src="../node_modules/vue/dist/vue.min.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+</body>
+<script>
+    let App={
+        template: '<div ref="btn">这是App组件<span>哈哈哈，App组件</span></div>',
+        created() {
+            console.log(this.$refs.btn);
+            
+        },
+        beforeMount() {
+            console.log(this.$refs.btn);
+            
+        },
+        mounted() {
+            // 如果是个标签绑定ref属性，使用this.$refs.xxx获取的是原生js的DOM对象
+            console.log(this.$refs.btn);
+            console.log(this.$refs.app);
+            
+        },
+    };
+    new Vue({
+        el: '#app',
+        template: '<App ref="app">',
+        components: {
+            App
+        },
+        created() {
+            console.log(this.$refs.app);
+            
+        },
+        beforeMount() {
+            console.log(this.$refs.app);
+            
+        },
+        mounted() {
+            // 如果给组件绑定ref属性，使用this.$refs.xxx获取的是组件对象
+            // ref属性值不能重名
+            console.log(this.$refs.app);
+            console.log(this.$refs.app.$el);    //获取组件元素
+            
+            console.log(this.$refs.btn);
+            
+        },
+    });
+</script>
+</html>

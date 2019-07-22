@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>08.vue过滤器</title>
+    <script src="../node_modules/vue/dist/vue.min.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+</body>
+<script>
+    // 全局过滤器，类似全局组件
+    Vue.filter('myReverse',function (params,paramsTwo) {
+        return paramsTwo+','+params.split(' ').reverse().join(' ');
+    });
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+                money: 0,
+                msg: 'hello use filter'
+            }
+        },
+        // 注：vue过滤器，第一个参数是“ | ”前的参数，不论过滤器函数里给了几个实参
+        template: '<div><h1>{{msg|myReverse("I am not a student","哈哈")}}</h1><input v-model="money" type="number"></input><div>{{money|calculateMoney(money)}}</div></div>',
+       // 过滤器作用：对数据“添油加醋”
+        // 组件内部过滤器filters: {
+            // 过滤器名字： function (params) {
+                // return {    //一定要有return
+                // }
+            // }
+            // 调用过滤器：数据属性|过滤器名称 【‘|’ 代表管道符】
+        // } 
+        filters: {
+            calculateMoney: function (value) {
+                return '￥'+value;
+            }
+        }
+    });
+</script>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>18.动态路由匹配</title>
+    <script src="../node_modules/vue/dist/vue.min.js"></script>
+    <script src="./node_modules/vue-router/dist/vue-router.min.js"></script>
+</head>
+<body>
+    <!-- 地址栏 路由范式 
+        (1) xxx.html#/user/1(params)        params  动态路由参数
+        (2) ooo.html#/user?userId=1
+    -->
+    <div id="app"></div>
+</body>
+<script>
+    Vue.use(VueRouter);
+
+    //  声明组件
+    // 公共组件
+    let CommonDesc={
+        data() {
+            return {
+                msg:'',
+            }
+        },
+        template:'<div>{{msg}}</div>',
+        /*
+            当使用路由参数，如从/user/page1到/user/page2，原来的组件实例会被复用。
+            因为两个路由都渲染同一组件，比起销毁再创建，复用显得更加高效。
+            这也意味着组件的生命周期钩子函数不会再被调用，如下文的created和updated，只有created会被调用一次，updated不会被调用
+        */
+        created() {
+            this.msg="web前端";
+            console.log('created');
+        },
+        // 复用组件时，想对路由参数的变化做出响应，可以简单地watch(监测变化)$route对象
+        watch: {
+            '$route'(to,from) {
+                console.log(to);        //当前路由
+                console.log(from);          //原先路由
+                this.msg=to.params.id;
+            }
+        }
+    }
+
+
+    let Movie={
+        template: '<div>这是movie部分</div>',
+        mounted() {
+            console.log(this);   
+        }
+    }
+
+    let App={
+        template: `    <div>
+             <router-link to='/index'>首页</router-link>
+             <router-link to='/movie'>视频</router-link>
+             <router-link to='/music'>音乐</router-link>
+             <router-link to='/novel'>小说</router-link>
+             <router-view><router-view>
+            </div>`,
+        components:{Index}
+    }
+
+    var Index={
+        template: `<div id="index">
+            <!-- 一级路由下绑定二级路由，即嵌套路由 -->
+            <router-link :to="{name: 'commonDesc',params:{id:'song'}}">歌曲</router-link>
+            <router-link :to="{name: 'commonDesc',params:{id:'movie'}}">视频</router-link>
+
+            <router-view></router-view>
+            </div>`
+    }
+
+
+    // 3.创建路由对象
+    var routers=new VueRouter({
+        // 4.配置路由参数
+        routes: [
+            // 路由匹配的规则
+            {
+                path: '/index',
+                name: 'index',
+                component: Index,
+                children: [ //Home组件下再绑定一层路由
+                    {
+                        path: '/index/:id',   //此处的path等同/home/song
+                        name: 'commonDesc',         //此处用的是公共组件，即有类似的dom结构，不同只在数据不同，所以children只写一个
+                        component: CommonDesc           //这就是动态路由匹配，嵌套路由则适用于dom结构不同、数据也不同的组件
+                    },
+                ],
+            },
+            {
+                path: '/movie',
+                component: Movie,
+            }
+        ]
+    });
+
+    new Vue({
+        el: '#app',
+        router: routers,
+        data() {
+            return {
+
+            }
+        },
+        // 抛出两个全局组件，router-link  router-view
+        // 抛出了两个对象 $router $route(路由信息对象)挂载到了Vue实例化对象上
+            // <router-link :to="{name:'userP',params:{id:'aaa'}}">这是路由范式1</router-link> <!-- 此处params里的key要与动态路由其一冒号后面的参数一致 -->
+            // <router-link :to="{name:'userQ',query:{userId:888}}">这是路由范式2</router-link> <!-- query的值可以随便写 -->
+        template:  `
+        <App/>
+        `,
+        components: {App},
+        // <!-- 注意一定要在一个根元素里！ -->
+        //     <div>
+        //     <router-link :to='{name: "home"}'>首页</router-link>
+        //     <router-view><router-view>
+        //     </div>
+        created() {
+            console.log(this.$route);
+            console.log(this.$router);
+            
+        }
+    });
+</script>
+</html>

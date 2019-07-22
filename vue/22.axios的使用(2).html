@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>22.axios的使用(2)</title>
+</head>
+<body>
+    <div id="app">
+        响应1：{{mesOne}}
+        响应2：{{mesTwo}}
+        <button @click='sendRequset()'>合并多请求</button>
+    </div>
+</body>
+<script src="../node_modules/vue/dist/vue.min.js"></script>
+<script src="./node_modules/axios/dist/axios.min.js"></script>
+<script>
+    Vue.prototype.$axios=axios;
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                mesOne: '',
+                mesTwo: ''
+            }
+        },
+        methods: {
+            sendRequset() {
+                console.dir(Promise);
+                var p = new Promise(function(resolve, reject){
+    //做一些异步操作
+    setTimeout(function(){
+        console.log('第一个Promise执行完成');
+        resolve('第一个Promise');
+    }, 200);
+    });  
+    p.then(function(val){
+    console.log(val);
+    //后续操作
+    
+})
+    // console.log(p);
+    
+                // baseURL将自动加在'url'前面，除非'url'是一个绝对url，可以设置一个baseURL，便于为所有axios实例配置相对路径
+                this.$axios.defaults.baseURL='http://127.0.0.1:8888/';      //配置的默认值 defaults， 全局的axios默认值
+                var req1=this.$axios.get('');
+                var req2=this.$axios.post('add','a=2');
+                // axios 执行多个并发请求
+                this.$axios.all([req1,req2])
+                .then(this.$axios.spread((mes1,mes2)=>{
+                    // 全部请求成功
+                        this.mesOne=mes1.data.msg;
+                        this.mesTwo=mes2.data.msg;
+                    }))
+                .catch(err=>{
+                    // 其中任何一个请求失败
+                    console.log(err);
+                });
+            }
+        },
+    });
+</script>
+</html>

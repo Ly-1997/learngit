@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>25.axios-取消请求</title>
+</head>
+<body>
+    <div id="app">
+        上传进度：{{rate}}%
+        <input type="file" name="" id="" @change="selectFile($event)" v-model="file">
+        <button @click="sendAjax()">发送请求</button><button @click="cancelAjax()">取消请求</button>
+        <button @click="goOnReq()">断点请求</button>
+    </div>
+</body>
+<script src="../node_modules/vue/dist/vue.min.js"></script>
+<script src="./node_modules/axios/dist/axios.min.js"></script>
+<script>
+    Vue.prototype.$axios=axios;
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                file: '',   //接收上传的文件
+                fileTwo: '',    //接收上传的文件
+                rate: 0,    //上传进度，以百分比作比
+
+                source: '',     //用于取消请求
+                currentLoaded: 0,   //当前已经请求的数据
+                total: '',  //文件的总共大小
+                
+                goOnLoaded: 0,  //断点再请求时的请求数据量
+            }
+        },
+        methods: {
+            goOnReq() { //断点请求，取消请求后继续请求
+                console.log(this.currentLoaded);
+                this.currentLoaded+=this.goOnLoaded;    //当前的数据量要将断点续传的数据量加起来
+                let goOnFile=this.fileTwo.slice(this.currentLoaded,this.fileTwo.size);
+                console.log(goOnFile);
+                this.$axios.defaults.baseURL="http://127.0.0.1:8888/";
+                var fd=new FormData();
+                fd.append('aaa',goOnFile);  //append剩余数据部分
+                let cancelToken=axios.CancelToken;
+                let source=cancelToken.source();
+                this.source=source;
+                this.$axios.post('upload',fd,{
+                    cancelToken: source.token,
+                    onUploadProgress: (progressEvent)=>{
+                        this.goOnLoaded=progressEvent.loaded;   //另使用一个变量，保存断点续传的进度，以防第一次请求和断点请求相互影响
+                        // this.currentLoaded+=progressEvent.loaded;   //当前上传的数据大小需加上断点上传的数据大小
+                        console.log(this.goOnLoaded,this.currentLoaded+this.goOnLoaded,progressEvent.total);
+                        this.rate=Math.floor((this.currentLoaded+this.goOnLoaded)/this.total*100);  //上传进度为，（已请求数据量+正在请求数据量）/上传的文件大小
+                    }
+                })
+                .then(()=>{
+                })
+                .catch(()=>{
+
+                });
+                
+            },
+            selectFile(e) { //input的change事件只当选择前后不一样的文件时起作用
+                // console.log(e.target.files[0]);
+                this.fileTwo=e.target.files[0];
+                console.log(this.file,this.fileTwo);
+            },
+            sendAjax() {
+                this.$axios.defaults.baseURL='http://127.0.0.1:8888';     //设置默认url前缀
+                var file=new FormData();
+                file.append('aaa',this.fileTwo);    //FormData().append(name,value,filename[可选])
+
+                let cancelToken=axios.CancelToken;
+                let source=cancelToken.source();
+                this.source=source;
+                this.$axios.post('/upload',file,{
+                    cancelToken: source.token,
+                    onUploadProgress: (progressEvent)=>{    //允许为上传处理进度事件
+                        console.log(progressEvent.loaded,progressEvent.total);
+                        
+                        this.currentLoaded=progressEvent.loaded;    //当前上传好的文件大小
+                        this.total=progressEvent.total; //该文件的大小
+                        this.rate=(progressEvent.loaded/progressEvent.total)*100;
+                        this.$nextTick(()=>{
+                            this.rate=Math.ceil(this.rate);
+                        });
+                    }
+                })
+                .then(()=>{
+
+                })
+                .catch(()=>{
+
+                });
+            },
+            cancelAjax() {
+                // 取消发送
+                this.source.cancel();
+            }
+        },
+        created() {
+
+        },
+        mounted() {
+            // 本监听是为使input file前后选择一样的文件也能起作用，将this.file置为空
+            document.getElementsByTagName('input')[0].addEventListener('click',()=> {
+                this.file='';
+            });
+        }
+    });
+</script>
+</html>

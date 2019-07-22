@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>15.vue-router的使用</title>
+    <!-- 先引入vue -->
+    <script src="../node_modules/vue/dist/vue.min.js"></script> 
+    <!-- 1.引包，引入核心插件vue-router -->
+    <script src="./node_modules/vue-router/dist/vue-router.min.js"></script>
+
+</head>
+<body>
+    <div id="app"></div>
+</body>
+<script>
+    // 2.让vue使用该VueRouter创建
+    // Vue.use(VueRouter);
+
+
+    // 声明组件
+    let Login={
+        template: `<div>这是登录页面</div>`,
+    };
+    let Register={
+        template: `<div>这是注册页面</div>`,
+    };
+
+
+    // 3.创建路由对象
+    var routers=new VueRouter({
+        // 4.配置路由对象
+        routes: [
+            // 路由匹配的规则
+            {
+                path: '/login',     //路径，a锚点路径
+                name: 'login',      //命名路由
+                component: Login,       //对应组件
+            },{
+                path: '/register',
+                component: Register,
+            }
+        ]
+    });
+
+    // 一使用vue-router，会自觉抛出两个全局组件router-link   router-view
+    // router-link 在浏览器渲染后会默认渲染出a标签
+    // router-view 匹配每个路由对应的出口(component中的具体视图)
+
+    // Cannot read property 'matched' of undefined,     出现这个报错是没有挂载
+    new Vue({
+        el: '#app',
+        router: routers,            //  5.将配置好的路由对象关联到vue实例化对象中
+        data() {
+            return {
+
+            }
+        },
+        template: `
+            <div>
+                <!-- router-link默认会被渲染为a标签，to默认会被渲染为href属性 -->
+                <router-link :to='{name:"login"}'>登录</router-link>             <!-- 命名路由的使用 -->
+                <router-link to='/register'>注册</router-link>
+
+                <!-- 路由组件的出口 -->
+                <router-view></router-view>
+            </div>
+        `,
+    });
+</script>
+</html>

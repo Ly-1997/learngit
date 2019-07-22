@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>17.嵌套路由</title>
+    <script src="../node_modules/vue/dist/vue.min.js"></script>
+    <script src="./node_modules/vue-router/dist/vue-router.min.js"></script>
+</head>
+<body>
+    <!-- 地址栏 路由范式 
+        (1) xxx.html#/user/1(params)        params  动态路由参数
+        (2) ooo.html#/user?userId=1
+    -->
+    <div id="app"></div>
+</body>
+<script>
+    Vue.use(VueRouter);
+
+    //  声明组件
+    let UserParams={
+        template: `<div>这是组件1</div>`,
+        created() {
+            console.log(this.$route);
+            
+        }
+    } 
+    let UserQuery={
+        template: `<div>这是组件2</div>`,
+        created() {
+            console.log(this.$route);
+            
+        }
+    }
+
+    let App={
+        template: `    <div>
+             <router-link :to='{name: "home"}'>首页</router-link>
+             <router-view><router-view>
+            </div>`,
+        components:{Home}
+    }
+
+    var Home={
+        template: `<div>
+            主页
+            <br />
+            <!-- 一级路由下绑定二级路由，即嵌套路由 -->
+            <router-link to="/home/song">歌曲</router-link>
+            <router-link to="/home/movie">视频</router-link>
+
+            <router-view></router-view>
+            </div>`
+    }
+
+
+    // 3.创建路由对象
+    var routers=new VueRouter({
+        // 4.配置路由参数
+        routes: [
+            // 路由匹配的规则
+            // {
+            //     path: '/user/:id',      //动态路由参数以冒号开头
+            //     name: 'userP',
+            //     component: UserParams
+            // },
+            // {
+            //     path: '/user',
+            //     name: 'userQ',
+            //     component:UserQuery
+            // }
+
+            {
+                path: '/home',
+                name: 'home',
+                component: Home,
+                children: [ //Home组件下再绑定一层路由
+                    {
+                        path: 'song',   //此处的path等同/home/song，以“/”开头的组件会被根路径
+                        name: 'song',
+                        component: UserParams
+                    },
+                    {
+                        path: 'movie',      //此处的path等同/home/movie
+                        name: 'movie',
+                        component: UserQuery
+                    }
+                ],
+            }
+        ]
+    });
+
+    new Vue({
+        el: '#app',
+        router: routers,
+        data() {
+            return {
+
+            }
+        },
+        // 抛出两个全局组件，router-link  router-view
+        // 抛出了两个对象 $router $route(路由信息对象)挂载到了Vue实例化对象上
+            // <router-link :to="{name:'userP',params:{id:'aaa'}}">这是路由范式1</router-link> <!-- 此处params里的key要与动态路由其一冒号后面的参数一致 -->
+            // <router-link :to="{name:'userQ',query:{userId:888}}">这是路由范式2</router-link> <!-- query的值可以随便写 -->
+        template:  `
+        <App/>
+        `,
+        components: {App},
+        // <!-- 注意一定要在一个根元素里！ -->
+        //     <div>
+        //     <router-link :to='{name: "home"}'>首页</router-link>
+        //     <router-view><router-view>
+        //     </div>
+        created() {
+            console.log(this.$route);
+            console.log(this.$router);
+            
+        }
+    });
+</script>
+</html>

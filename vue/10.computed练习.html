@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>10.computed练习</title>
+    <style>
+        .active {
+            background: skyblue;
+        }
+    </style>
+</head>
+<script src="../node_modules/vue/dist/vue.min.js"></script>
+<body>
+    <div id="app">
+        <audio :src="audioSrc" controls autoplay></audio>
+        <ul>
+            <li v-for="(item,index) in musicData" :class="currentIndex==index?'active':''" @click='changeSong(index)'>
+                <h3>歌手：{{item.singer}}</h3>
+                <h4>歌名：{{item.name}}</h4>
+            </li>
+        </ul>
+    </div>
+</body>
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {       
+                musicData:[{
+                    singer: '河图',
+                    name: '倾尽天下',
+                    songSrc: 'http://music.163.com/song/media/outer/url?id=609829.mp3',
+                },{
+                    singer: "May'n",
+                    name: 'Chase the world',
+                    songSrc: 'http://music.163.com/song/media/outer/url?id=27571867.mp3'
+                },{
+                    singer: '周华健',
+                    name: '难念的经',
+                    songSrc: 'http://music.163.com/song/media/outer/url?id=5271858.mp3'
+                },{
+                    singer: '许嵩',
+                    name: '两种悲剧',
+                    songSrc: 'http://music.163.com/song/media/outer/url?id=167748.mp3'
+                }],
+                currentIndex: 0,    //记录点击的index
+            }
+        },
+        methods: {
+            changeSong(index) {
+                // this.currentIndex=index;         //对应computed中的(1)
+                this.audioSrc=index;        //对应computed中的(2)，设置值，走的set方法，不走get
+                console.log(this.audioSrc);
+                
+            }
+        },
+        // computed和methods，computed会有缓存，methods不会有，
+        // computed和methods某些情况下可以实现一样的效果，但methods每次会重新唤起执行，
+        // computed则基于它们的响应式依赖进行缓存，响应无变化，computed不会触发
+        computed: {
+            // (1)
+            // audioSrc() {
+            //     // 默认是getter
+            //     return this.musicData[this.currentIndex].songSrc;
+            // }
+            // (2)
+            audioSrc: {
+                // set和get
+                set(newV) {
+                    console.log(newV);  
+                    this.currentIndex=newV;
+                },
+                get() {
+                    return this.musicData[this.currentIndex].songSrc;
+                }
+            }
+        }
+    });
+</script>
+</html>

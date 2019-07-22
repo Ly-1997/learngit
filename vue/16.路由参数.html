@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>16.路由参数</title>
+    <script src="../node_modules/vue/dist/vue.min.js"></script>
+    <script src="./node_modules/vue-router/dist/vue-router.min.js"></script>
+</head>
+<body>
+    <!-- 地址栏 路由范式 
+        (1) xxx.html#/user/1(params)        params  动态路由参数
+        (2) ooo.html#/user?userId=1
+    -->
+    <div id="app"></div>
+</body>
+<script>
+    Vue.use(VueRouter); //如果使用模块化机制编程，导入vue、VueRouter，要调用Vue.use(VueRouter)
+
+    //  声明组件
+    let UserParams={
+        template: `<div>这是组件1</div>`,
+        created() {
+            console.log(this.$route);       //通过this.$route访问当前路由
+            console.log(this.$router);      //通过this.$router访问路由器
+            
+        }
+    } 
+    let UserQuery={
+        template: `<div>这是组件2</div>`,
+        created() {
+            console.log(this.$route);
+            console.log(this.$router);
+            
+        }
+    }
+
+
+    // 3.创建路由对象
+    var routers=new VueRouter({
+        // 4.配置路由参数
+        routes: [
+            // 路由匹配的规则
+            {
+                path: '/user/:id',      //动态路由参数以冒号开头
+                name: 'userP',
+                component: UserParams
+            },
+            {
+                path: '/user',
+                name: 'userQ',
+                component:UserQuery
+            }
+        ]
+    });
+
+    new Vue({
+        el: '#app',
+        router: routers,
+        data() {
+            return {
+
+            }
+        },
+        // 抛出两个全局组件，router-link  router-view
+        // 抛出了两个对象 $router $route(路由信息对象)挂载到了Vue实例化对象上
+        template:  `
+        <!-- 注意一定要在一个根元素里！ -->
+            <div>
+            <router-link :to="{name:'userP',params:{id:'aaa'}}">这是路由范式1</router-link> <!-- 此处params里的key要与动态路由其一冒号后面的参数一致 -->
+            <router-link :to="{name:'userQ',query:{userId:888}}">这是路由范式2</router-link> <!-- query的值可以随便写 -->
+            <router-view><router-view>
+            </div>
+        `,
+        created() {
+            // console.log(this.$route);
+            // console.log(this.$router);
+            
+        }
+    });
+</script>
+</html>

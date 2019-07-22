@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>05.vue中的局部组件</title>
+    <script src="../node_modules/vue/dist/vue.min.js"></script>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        .vheader {
+            height: 40px;
+            background: skyblue;
+        }
+        button {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+            
+    </div>
+    <script>
+        Vue.component('Vbtn',{ //全局组件，第一个参数是组件的名字，第二个是options
+            template: `<button>哈哈哈</button>`,
+        });
+        // 声子   挂子   用子
+        let Vheader={
+            template: `<div><img :src="isShow?'./u=2382410723,4174003088&fm=26&gp=0.jpg':'./u=2798140212,3230393672&fm=26&gp=0.jpg'" alt="" srcset="">
+            <button @click="isShow=!isShow">点击改变图片</button>这是头部<Vbtn/></div>`,
+            data() {
+                return {
+                    isShow: true,
+                }
+            }
+        }
+        let Vaside={
+            template: `<div>这是侧边栏<Vbtn></Vbtn></div>`,
+        }
+        let Vcontent={
+            template: `<div>这是内容区<Vbtn/></div>`,
+        }
+        let Vfooter={
+            template: `<div>这是底部<Vbtn></Vbtn></div>`,
+        }
+
+        // 1.声明局部组件（子组件）,子组件首字母用大写，为与html标签区分，与new Vue的区别就是没有el,并且子组件里的data一定是函数
+        let App={
+            data() {
+                return {
+
+                }
+            },
+            // template中必须有一个根元素将所有组件、标签包裹起来，并且只能有一个根元素
+            template: '<div class="main"><span>这是入口处</span><Vheader class="vheader"/><Vaside/><Vcontent/><Vfooter/><div>another</div></div>',
+            components: {
+                Vheader,
+                Vaside,
+                Vcontent,
+                Vfooter,
+            }
+        };
+
+        // v-for优先级较高，高于v-if v-show {{}} v-html等
+        new Vue({
+            el: '#app', //根元素，css选择器，#app，.app
+            data() {
+                return {
+                    // isShow: true,
+                }
+            },
+            template: '<App></App>',    //3.使用组件，注：必须是闭合标签，可以是单闭合，也可以是双闭合。
+            components: {   //2.挂载
+                App
+            }
+        });
+    </script>
+</body>
+</html>

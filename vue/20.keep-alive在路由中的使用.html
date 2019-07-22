@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>20.keep-alive在路由中的使用</title>
+</head>
+<body>
+    <div id="app">
+        <router-link to='/code'>编程</router-link>
+        <router-link to='/novel'>小说</router-link>
+        <keep-alive>        <!-- keep-alive包裹起来的组件会被存入缓存，不会被销毁，所以如果使用请慎用 -->
+            <router-view></router-view>
+        </keep-alive>
+    </div>
+</body>
+<script src="../node_modules/vue/dist/vue.min.js"></script>
+<script src="./node_modules/vue-router/dist/vue-router.min.js"></script>
+<script>
+    Vue.use(VueRouter);    
+    var Code={  //编程组件
+        template: '<div>这是编程部分</div>',
+        created() {
+            console.log('code组件创建了');
+        },
+        mounted() {
+            console.log('code组件渲染完成');
+        },
+        destroyed() {
+            console.log('code组件销毁');
+        }
+    };
+    var Novel={     //小说组件
+        template: '<div><p @click="changeColor($event)">这是小说部分</p></div>',
+        created() {
+            console.log('novel组件创建了');
+        },
+        mounted() {
+            console.log('novel组件渲染完成');
+        },
+        destroyed() {
+            console.log('novel组件销毁');
+        },
+        methods: {
+            changeColor: function (e) {
+                console.log(e);
+                e.target.style.color="red";
+            }
+        }
+    };
+    var router=new VueRouter({
+        routes: [{
+            path: '/code',
+            component: Code
+        },
+        {
+            path: '/novel',
+            component: Novel
+        }]
+    });
+    new Vue({
+        el: '#app',
+        router,
+        data() {
+            return {
+
+            }
+        }
+    });
+</script>
+</html>

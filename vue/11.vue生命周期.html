@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>11.vue生命周期</title>
+    <script src="../node_modules/vue/dist/vue.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <App></App>
+    </div>
+</body>
+<script>
+    let Test={
+        template: '<div class="test">测试组件<p>{{msg}}</p><p><button @click="changeMsg">点击改变msg</button></p></div>',
+        data() {
+            return {
+                msg: '这是一个入口组件的test组件'
+            }
+        },
+        methods: {
+            changeMsg() {
+                this.msg=="test组件的msg信息已改"?this.msg='这是一个入口组件的test组件':this.msg='test组件的msg信息已改'
+            }
+        },
+        beforeCreate() {
+            // 组件创建之前，数据没有声明，可以做些诸如加载类的样式
+            console.log(this.msg);
+            
+        },
+        created() {
+            // 组件创建之后
+            // 使用组件，会经历created生命周期，在created方法中可以操作后端的数据，数据响应视图
+            // 应用：发起ajax请求
+            console.log(this.msg);
+            this.msg="created中改变了msg的值"
+        },
+        beforeMount() {
+            // 挂载数据到DOM之前会调用，只会挂载组件，组件里的具体元素不会渲染
+            console.log(document.querySelector("#app"));
+            console.log(document.querySelector(".test"));       //这时test组件还未挂载
+            
+        },
+        mounted() {
+            // 挂载数据到DOM之后会调用，Vue作用以后的DOM，在这一生命周期中，所有元素已经渲染完毕
+            console.log(document.querySelector("#app"));        
+            console.log(document.querySelector(".test"));       //test组件已挂载
+        },
+        beforeUpdate() {
+            // 在更新DOM之前，调用此钩子函数，应用：获取原始的DOM(未改变的DOM)
+            // 只在组件发生更改时会调用
+            console.log(document.querySelector("#app").innerHTML);
+        },
+        updated() {
+            // 在更新DOM之后，调用此钩子函数，应用：获取最新的DOM(已改变的DOM)
+            // 只在组件发生更改时会调用
+            console.log(document.querySelector("#app").innerHTML);
+        },
+        beforeDestroy() {   
+            //在销毁组件之前，在组件创建——销毁过程中才会调用，比如v-if
+            console.log('beforeDestory');   
+        },
+        destroyed() {
+            // 销毁组件，在组件创建——销毁过程中才会调用，比如v-if
+            console.log('destoryed');
+        },
+        activated() {
+            console.log('组件被激活了');        //组件已经在缓存中保存，keep-alive将组件包了起来，所以即便销毁、重建，生命周期也只会在一开始时经历一次，不会多次调用生命周期(比如不会打印出生命周期中的方法)
+        },
+        deactivated() {
+            console.log('组件被停用了');    
+        }   
+    }
+    let App={
+        components: {
+            Test
+        },
+        data() {
+            return {
+                isShow: true,
+            }
+        },
+         // <keep-alive></keep-alive> Vue的内置组件，能在组件的切换过程中将状态保留在内存中，防止重复渲染DOM
+        template: `<div>
+            <keep-alive><Test v-if="isShow"></Test></keep-alive>
+            <button @click="isShow=!isShow">点击销毁/创建组件</button>
+            </div>`,
+    }
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+            }
+        },
+        components: {
+            App
+        },
+        // template: '<App>'
+    });
+</script>
+<script>
+   
+</script>
+</html>

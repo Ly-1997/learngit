@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>06.父组件通信到子组件</title>
+    <script src="../node_modules/vue/dist/vue.min.js"></script>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            text-align: center;
+        }
+        .vheader {
+            height: 40px;
+            background: skyblue;
+        }
+        .vaside {
+            height: 500px;
+            width: 30%;
+            float: left;
+            background: burlywood;
+        }
+        .vcontent {
+            height: 500px;
+            width: 70%;
+            float: right;
+            background: yellowgreen;
+        }
+        .vfooter {
+            height: 50px;
+            background: #e3d3d3;
+            clear: both;
+        }
+        button {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+    </div>
+    <script>
+        Vue.component('Vbtn',{
+            template: `<button><slot></slot></button>`,
+        });
+        // 声子   挂子   用子
+        let Vheader={
+            template: `<div>这是头部<Vbtn/></div>`,
+            data() {
+                return {
+                    isShow: true,
+                }
+            },
+            mounted() {
+                console.log(this);
+            }
+        }
+        let Vaside={
+            template: `<div>这是侧边栏<Vbtn>这是侧边栏</Vbtn></div>`,
+        }
+        let Vcontent={
+            template: `<div>这是内容区<Vbtn>这是内容区</Vbtn><ul><li v-for='(item,index) in contentObjs'>{{index}}--{{item.value}}</li></ul></div>`,
+            props: ['contentObjs'],
+        }
+        let Vfooter={
+            template: `<div><span>这是底部</span><Vbtn>这是底部</Vbtn></div>`,
+        }
+
+        // 1.声明局部组件（子组件）,子组件首字母用大写，为与html标签区分，与new Vue的区别就是没有el,并且子组件里的data一定是函数
+        let App={
+            data() {
+                return {
+                    contentObj: [
+                        {id:0,title:'名菜',value:'八大菜系'},
+                        {id:1,title:'动漫',value:'国漫，动漫'},
+                        {id:2,title:'历史',value:'泱泱二十四史'}
+                    ]
+                }
+            },
+            // template中必须有一个根元素将所有组件、标签包裹起来，并且只能有一个根元素
+            template: `<div class="main"><Vheader class="vheader"/><Vaside class='vaside'/><Vcontent class='vcontent' :contentObjs='contentObj'/><Vfooter class='vfooter'/></div>`,
+            components: {
+                Vheader,
+                Vaside,
+                Vcontent,
+                Vfooter,
+            }
+        };
+
+        // v-for优先级较高，高于v-if v-show {{}} v-html等
+        new Vue({
+            el: '#app', //根元素，css选择器，#app，.app
+            data() {
+                return {
+                    // isShow: true,
+                }
+            },
+            template: '<App></App>',    //3.使用组件，注：必须是闭合标签，可以是单闭合，也可以是双闭合。
+            components: {   //2.挂载
+                App
+            }
+        });
+    </script>
+</body>
+</html>
