@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>在线商城使用情况</title>
+    <script src="./jquery.js"></script>
+    <script src="./vue.min.js"></script>
+	<script type="text/javascript" src="https://oapi.fosun.com/m/js/fosun_oapi_login-2.0.0_v2.js"> </script>
+    <link rel="stylesheet" href="./common.css">
+    <style>
+        body {
+            padding-top: 4%;
+        }
+        .gold {
+            width: 100%;
+            height: 100%;
+        }
+        .functions {
+            position: fixed;
+            width: 100%;
+            left: 0;
+            top: 0;
+            z-index: 100;
+            background: #c3c7cd;
+        }
+
+        .order li {
+            width: 96%;
+            margin: 4% 2%;
+            background: #fff;
+            position: relative;
+            font-size: 0.9rem;
+            padding: 2%;
+            border-radius: 8px;
+        }
+        .order li:first-child {
+            margin-top: 0;
+        }
+        .order li .commonStyle {
+            overflow: hidden;
+        }
+        .order li .commonStyle span:first-child {
+            float: left;
+        }
+        .order li .commonStyle span:last-child {
+            float: right;
+        }
+        .order li p:nth-child(2) {
+            margin: 6% 0 4%;
+        }
+        .order li .threeIf {
+            text-align: center;
+            margin-bottom: 4%;
+        }
+        .order li .threeIf span:first-child {
+            float: left;
+        }
+        .order li .threeIf span:last-child {
+            float: right;
+        }
+
+        /* 头部功能区css */
+        .headFun {
+            /* overflow: hidden; */
+            position: relative;
+            height: 32px;
+            /* width: 100%; */
+        }
+        /* 排序的css */
+        .sort {
+            /* position: absolute; */
+            margin-left: 3%;
+            /* width: 56%; */
+        }
+        .sort select {
+            height: 1.5rem;
+            font-size: 0.7rem;
+        }
+        .sort select option {
+            font-size: 0.6rem;
+        }
+        /* 筛选的css */
+        .selectPart {
+            text-align: right;
+            position: absolute;
+            right: 2%;
+            width: 100%;
+        }
+        .selectPart select {
+            height: 1.5rem;
+            display: inline;
+            margin-right: -2%;
+            font-size: 0.7rem;
+            width: 25%;
+        }
+        .selectPart select option {
+            font-size: 0.6rem;
+            height: 1.4rem;
+        }
+        .selectPart button, .sort button {
+            background: #ff9800;
+            border: none;
+            padding: 2% 4%;
+            color: #fff;
+            font-size: 0.6rem;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        /* loading 遮罩 */
+        .mask {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 100;
+        }
+        .mask img {
+            position: absolute;
+            top: 50%;
+            left: 45%;
+            animation:rotating 1.2s linear infinite
+        }
+        @keyframes rotating{
+            from{transform:rotate(0)}
+            to{transform:rotate(360deg)}
+        }
+
+    </style>
+</head>
+<body style="background: #c3c7cd;">
+        <!-- 加入筛选功能，条件为增加部分三个是否 -->
+        <!-- 加入排序,排序条件:1委托人,2账户开通时间 -->
+    <div class="gold">
+        <div class="functions">
+            <!-- 排序功能 -->
+            <div class="sort">
+                <select name="" id="" style="width: 50%;">
+                    <option value="">委托人,降序排列</option>
+                    <option value="">委托人,升序排列</option>
+                    <option value="">账户开通时间,降序排列</option>
+                    <option value="">账户开通时间,升序排列</option>
+                </select>
+                <button type="button" style="margin-left: -2%;">排序</button>
+            </div>
+            <!-- 筛选功能 -->
+            <div class="headFun">
+                <div class="selectPart">
+                    <select name="" id="">
+                        <option value="">是否登陆</option>
+                        <option value="1">是</option>
+                        <option value="0">否</option>
+                    </select>
+                    <select name="" id="" style="width: 29%; margin: 0 0% 0 2%;">
+                        <option value="">是否加入购物车</option>
+                        <option value="1">是</option>
+                        <option value="0">否</option>
+                    </select>
+                    <select name="" id="" style="margin-right: -1%;">
+                        <option value="">是否下单</option>
+                        <option value="1">是</option>
+                        <option value="0">否</option>
+                    </select>
+                    <button type="button" @click="selectList($event)">筛选</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="order" v-if="obj.length>0" style="padding-top: 50px;">
+            <ul>
+                <!-- 增加：是否登陆     是否加入购物车      是否下单   返回是否，是绿色，否红色 -->
+                <li v-for="(item,index) in obj">
+                    <p class="commonStyle"><span>客商编号：{{item.customerNum}}</span><span>省区/品牌：{{item.provinBrand}}</span></p>
+                    <!-- <p>款式编码：0099323832928923902</p> -->
+                    <p>加盟商名称：{{item.franchise}}</p>
+                    <p class="threeIf">
+                        <span>是否登陆：<span :style="item.hasLogin=='是'?'color: green':'color: red'">{{item.hasLogin}}</span></span>
+                        <span>是否加入购物车：<span :style="item.hasAddShopcar=='是'?'color: green; float:none;':'color: red; float: none'">{{item.hasAddShopcar}}</span></span>
+                        <!-- <span>是否加入购物车:<span :style="item.hasAddShopcar=='是'?'color: red':'color: green'">{{item.hasAddShopcar}}</span></span> -->
+                        <span>是否下单：<span :style="item.hasAddOrder=='是'?'color: green':'color: red'">{{item.hasAddOrder}}</span></span>
+                    </p>
+                    <!-- <a :href="'tel:'+item.clientPhone ">  注意item.clientPhone不要写在字符串里面，要写外面 -->
+                    <p class="commonStyle"><span>委托人：{{item.client}}</span><span>委托人手机号码：<a :href="'tel:'+item.clientPhone ">{{item.clientPhone}}</a></span></p>
+                </li>
+            </ul>
+        </div>
+    <div v-else class="noDate">暂无数据</div>
+
+    <div class="mask" :style="mask?'display:block':'display: none;'"><img src="./loading.png" alt=""></div>
+    </div>
+</body>
+<script>
+        new Vue({
+            el: '.gold',
+            data() {
+                return {
+                    obj: [],    //从接口中拿取数据
+                    // obj: [
+                    //     {customerNum:0001,provinBrand:'安徽/老庙',franchise:'测试0001店',client:'admin',clientPhone:'11122223333'},
+                    //     {customerNum:0001,provinBrand:'安徽/老庙',franchise:'测试0001店',client:'admin',clientPhone:'11122223333'},
+                    //     {customerNum:0001,provinBrand:'安徽/老庙',franchise:'测试0001店',client:'admin',clientPhone:'11122223333'},
+                    //     {customerNum:0001,provinBrand:'安徽/老庙',franchise:'测试0001店',client:'admin',clientPhone:'11122223333'},
+                    //     {customerNum:0001,provinBrand:'安徽/老庙',franchise:'测试0001店',client:'admin',clientPhone:'11122223333'},
+                    //     {customerNum:0001,provinBrand:'安徽/老庙',franchise:'测试0001店',client:'admin',clientPhone:'11122223333'},
+                    // ],
+                    email: '',      //通过它们内部接口拿到邮箱
+                    hasAddOrder: '',    //是否下单
+                    hasAddShopcar: '',      //是否加入购物车
+                    hasLogin: '',       //是否登陆
+                    mask: false,    //是否显示遮罩
+                }
+            },
+            created() {
+                this.requestDate();
+            },
+            methods: {
+                selectList(e) {
+                    this.mask=true;
+                    this.hasAddOrder=e.target.previousElementSibling.value;
+                    this.hasAddShopcar=e.target.previousElementSibling.previousElementSibling.value;
+                    this.hasLogin=e.target.parentNode.firstElementChild.value;
+                    console.log(this.hasAddOrder,this.hasAddShopcar,this.hasLogin);
+                    
+                    this.requestDate();
+                },   
+                requestDate() {
+                    var that=this;
+                    fosun_oapi_login.getDDAccount (function(user){ 
+                        that.email=user.email;
+                        $.post(
+                            'http://yj.yuyuantm.com.cn/api.php?t=ch_Gate_getNoLoginList',
+                            {
+                                'email': that.email,
+                                'hasLogin': that.hasLogin,
+                                'hasAddShopcar': that.hasAddShopcar,
+                                'hasAddOrder': that.hasAddOrder
+                            },
+                            function (res) {
+                                if (res.data) {
+                                    that.obj=res.data;
+                                } else {
+                                    that.obj=[];
+                                }
+                                that.mask=false;
+                            },
+                            'json'
+                        );
+                        } 
+                    );
+                }
+            }
+        });
+    </script>
+</html>

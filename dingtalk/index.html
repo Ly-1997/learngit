@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>豫园</title>
+    <script src="./jquery.js"></script>
+    <script src="./vue.min.js"></script>
+	<script type="text/javascript" src="https://oapi.fosun.com/m/js/fosun_oapi_login-2.0.0_v2.js"> </script>
+    <link rel="stylesheet" href="./swiper.min.css">
+    <script src="./swiper.min.js"></script>
+    <script src="./base64Code.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html,body {
+            width: 100%;
+            height: 100%;
+        }
+        img {
+            vertical-align: middle;
+        }
+        li {
+            list-style: none;
+        }
+        .clearFix::before,
+        .clearFix::after {
+            content: "";
+            display: block;
+            visibility: hidden;
+            height: 0;
+            line-height: 0;
+            clear: both;
+        }
+
+
+        /* 导航栏 */
+        nav {
+            color: #fd6e46;
+            font-size: 0.6em;
+            text-align: center;
+            height: 40px;
+            line-height: 40px;
+            font-weight: 700;
+        }
+        nav span {
+            font-size: 14px;
+            position: absolute;
+            left: 4%;
+        }
+        .swiper-container img {   
+            width: 100vw;
+            height: 40vw;
+        }
+
+        /* 总体页面设计 */
+        #smallPage {
+            min-height: 100%;
+            position: relative;
+            padding-bottom: 13%;
+        }
+
+        /* 主要部分 */
+        .mainPart {
+            width: 96%;
+            margin: 10px auto;
+            /* color: #939393; */
+        }
+        .mainPart ul {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .mainPart h4 {
+            color: #7c7c7c;
+            margin: 10px 0;
+            font-size: 0.8em;
+        }
+        .mainPart li {
+            color: #939393;
+            display: flex;
+            flex-direction: column;
+            padding-top: 4%;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+        .mainPart li .aImgFirst {
+            width: 50%;
+        }
+        .mainPart li .aImgIcon {
+            position: absolute;
+            width: 24%;
+            right: 0;
+            top: 0;
+        }
+        .mainPart h5 {
+            width: 64%;
+            text-align: center;
+            font-size: 0.7em;
+        }
+        .mainPart li {
+            width: 23vw;
+            height: 23vw;
+            /* border: 1px solid #f3f3f3; */
+            border-radius: 6px;
+            text-decoration: none;
+            margin-right: 1%;
+            position: relative;
+            outline: none;
+            z-index: 10;
+
+        }
+        .mainPart li:nth-child(4n) {
+            margin-right: 0;
+        }
+
+        /* 版本号 */
+        .version {
+            text-align: center; 
+            color: #999;
+            position: absolute;
+            width: 100%;
+            bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="smallPage">
+        <!-- 头部 -->
+
+        <div class="swiper-container"> 
+            <div class="swiper-wrapper">
+              <div class="swiper-slide" v-for="(item,i) in imgUrl"><img :src="item" alt=""><a href="javascript:void(0);"></a></div>
+            </div>
+            <div class="swiper-pagination"></div><!--分页器。如果放置在swiper-container外面，需要自定义样式。-->
+        </div>
+
+
+        <!-- 主体部分 -->
+        <div v-for="(items,index) in list['list']" class="mainPart">
+            <h4>{{index}}</h4>
+            <ul>
+                <li v-for="(item,i) in items" @click="clicka(item.url,index)"><img class="aImgFirst" :src="item.img" alt=""><h5>{{item.title}}</h5><img :src="item.icon" alt="" v-if="item.icon" class="aImgIcon"></li>
+            </ul>
+        </div>
+        <p class="version">{{version}}</p>
+    </div>
+</body>
+<script>
+    
+    new Vue({
+        el: "#smallPage",
+        data() {
+            return {
+                list: {},   //拿到列表信息
+                code:'',    //微应用免登授权码
+                imgUrl: [],     //图片地址
+                swiper:'',      //保存swiper实例，用于updated操作
+                version: '',    //版本号
+            }
+        },
+		created() {
+            var that=this;
+            fosun_oapi_login.getDDAccount (function(user){ 
+                 // alert("=======user======="+JSON.stringify(user)); 
+                 // console.log("=======user======="+JSON.stringify(user));
+                //  测试code：chensm@yuyuantm.com.cn
+                that.code=user.email;
+                $.post(
+                  'http://yj.yuyuantm.com.cn/api.php?t=ch_Gate_getMenu',
+                  {
+                      'code': that.code,
+                  },
+                  function (res) {
+                      that.list=res.data;
+                      that.version=res.data.version;
+                      that.imgUrl=res.data.banner;
+                  },
+                  'json'
+                );
+            } 
+            );
+        },
+        methods: {
+            clicka(url,bigTitle) {
+                var encodedEmail = Base64.encode(this.code); //yybi_email
+                encodedEmail = Base64.encode(encodedEmail); //yybi_email
+                encodedEmail = Base64.encode(encodedEmail); //yybi_email   
+                console.log(url,bigTitle);
+                console.log(url+'&yybi_email='+encodedEmail);
+                if (bigTitle='复星地产') {
+                    window.location.href=url+'&yybi_email='+encodedEmail;                            
+                } else {
+                    window.location.href=url;                            
+                }
+                // console.log(encodedEmail);       
+                // var decodeEmail=Base64.decode(encodedEmail);
+                // console.log(decodeEmail);
+                // console.log(Base64.decode(decodeEmail));
+                // decodeEmail=Base64.decode(decodeEmail);
+                // console.log(Base64.decode(decodeEmail));
+                // $.ajax({
+                //     type: "POST",
+                //     url: url,
+                //     contentType: "application/json; charset=utf-8",
+                //     data: {
+                //       'yybi_email':encodedEmail,
+                //     },
+                //     dataType: "json",
+                //     // async: true,
+                //     timeout: 50000,
+                //     success: function(msg){
+                //         console.log('这是成功'+msg);
+                        
+                //         // alert("Data delete success:"+JSON.stringify(msg));
+                //     },
+                //     error: function(msg){
+                //     //   window.location.href=url;        
+                //         console.log('这是失败'+msg);
+                        
+                //         // alert("Data delete failed:"+JSON.stringify(msg));
+                //     }
+                // });
+
+                // window.location.href=url;        
+
+                // $.post(
+                //   url,
+                //   {
+                //       'yybi_email':encodedEmail,
+                //   },
+                //   function (res) {
+                //       console.log(res);
+                      
+                //       window.location.href=url+'&yybi_email='+encodedEmail;        
+                //   },
+                //   'json'
+                // );
+            },
+            initSwiper() {
+                this.swiper = new Swiper('.swiper-container', {
+                 autoplay: {
+                    delay: 1500, //1.5秒切换一次
+                    disableOnInteraction: false
+                 },
+                 observer: true,//修改swiper自己或子元素时，自动初始化swiper
+                 observeParents: true,//修改swiper的父元素时，自动初始化swiper
+                 loop: true,
+                //  loopAdditionalSlides: 3,                 
+                 pagination: {
+                    el: '.swiper-pagination',
+                 }
+                });
+            },
+        },
+        mounted() {           
+        },
+        updated() {
+            this.initSwiper();
+        }
+    });
+    
+</script>
+</html>

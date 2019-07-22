@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>近1个月内订单</title>
+    <script src="./jquery.js"></script>
+    <script src="./vue.min.js"></script>
+	<script type="text/javascript" src="https://oapi.fosun.com/m/js/fosun_oapi_login-2.0.0_v2.js"> </script>
+    <link rel="stylesheet" href="./common.css">
+    <style>
+        body {
+            padding-top: 4%;
+        }
+        li {
+            width: 96%;
+            margin: 4% 2%;
+            background: #fff;
+            position: relative;
+            font-size: 0.9rem;
+            padding: 2%;
+            border-radius: 8px;
+        }
+        li:first-child {
+            margin-top: 0;
+        }
+        li .num {
+            position: absolute;
+            color: #ff5a07;
+            right: 10%;
+            top: 20%;
+            font-size: 1.2rem;
+        }
+        li p:nth-child(4) {
+            color: #939393;
+            font-size: 0.8rem;
+            text-align: right;
+            margin-top: 10px;
+        }
+        li p:first-child {
+            overflow: hidden;
+        }
+        li p:first-child span:first-child {
+            float: left;
+        }
+        li p:first-child span:last-child {
+            float: right;
+        }
+        li p:nth-child(2) {
+            margin: 6% 0 4%;
+        }
+        /* 商品部分 */
+        .product {
+            margin: 4% 0 4%;
+            overflow: hidden;
+        }
+        .productLeft {
+            float: left;
+            width: 25%;
+        }
+        .productRight {
+            float: right;
+            width: 73%;
+        }
+        .productRight p:nth-child(2) {
+            margin: 2% 0 2%;
+        }
+        li p:last-child {
+            clear: both;
+        }
+    </style>
+</head>
+<body style="background: #c3c7cd;">
+    <div class="order" v-if="obj.length>0">
+        <ul>
+            <li v-for="(item,index) in obj">
+                <p><span>订单编号：{{item.orderNum}}</span><span>省区/品牌：{{item.provinBrand}}</span></p>
+                <p>款式编码：{{item.styleNum}}</p>
+                <p>加盟商名称：{{item.franchise}}</p>
+                <span class="num">x{{item.num}}</span>
+                <div class="product">
+                    <img :src="item.picUrl" alt="" class="productLeft">
+                    <div class="productRight">
+                        <p>{{item.styleName}}</p>
+                        <p>克重：{{item.zlfw}}</p>
+                        <p>规格：{{item.gg}}</p>
+                    </div>
+                </div>
+                <p>下单时间：{{item.orderTime}}</p>
+            </li>
+        </ul>
+    </div>
+    <div class="noDate" v-else>暂无数据</div>
+</body>
+<script>
+    new Vue({
+        el: '.order',
+        data() {
+            return {
+                obj: '',    //从接口中拿取数据
+                email: '',      //从内部接口里拿邮箱
+            }
+        },
+        created() {
+            // let that=this;
+            // $.post(
+            //     'http://master.saas.chonghui.net/api.php?t=ch_Gate_getLast3DayOrder',
+            //     {
+            //         // 'code':that.code
+            //     },
+            //     function (res) {
+            //         that.obj=res.data;
+            //     },
+            //     'json'
+            // );
+
+            var that=this;
+                fosun_oapi_login.getDDAccount (function(user){ 
+                 // alert("=======user======="+JSON.stringify(user)); 
+                 // console.log("=======user======="+JSON.stringify(user));
+                that.email=user.email;
+                $.post(
+                'http://master.saas.chonghui.net/api.php?t=ch_Gate_getLast3DayOrder',
+                {
+                    'email': that.email,
+                },
+                function (res) {
+                    that.obj=res.data;
+                },
+                'json'
+                );
+            } 
+            );
+        }
+    });
+</script>
+</html>
