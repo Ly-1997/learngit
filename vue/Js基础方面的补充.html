@@ -48,11 +48,48 @@
                 返回值：Array，包含被删除元素的新数组，如果有的话
             7.concat()    把当前Array和另一个Array连接起来，返回一个新Array
             8.join()    把Array中的每个元素用指定字符串连接起来，返回连接后的字符串
-    */
 
-    'use strict';
-    abc='ememememem';
-    console.log(abc);
+        (7) js的对象是一种无序集合数据类型，由若干键值对组成
+
+        (8) 因为js的对象是动态类型，可以自由地给对象添加或删除属性
+
+        (9) 检测对象是否有某一属性，可以用in操作符， 'name' in obj
+            但如果用in判断属性存不存在，这个属性不一定是该对象得到的，可能是该对象继承的
+            如 'toString' in obj; //true，因为所有对象最终会在原型链上指向Object,toString定义在Object中，所以obj中存在toString属性
+            如果要判断属性是否是自身所有，而非继承得到，可以用hasOwnProperty()方法，如obj.hasOwnProperty('age');
+
+        （10）ES6引入了新数据类型Map，Map是一组键值对结构，有极快的查找速度
+        */
+       
+       'use strict';
+       //    abc='ememememem';
+       //    console.log(abc);
     
+       //  初始化Map需要一个二维数组
+       var m=new Map([['xiaoMing',90],['xiaoHong',80],['xiaoHuang',70]]);
+       console.log(m.get('xiaoHuang'));
+       //  或者直接初始化空Map
+       var n=new Map();
+       n.set('A',80);   //添加键值，key———value
+       n.set('B',100);
+       console.log(n.has('A')); //是否存在Key， has(Key)
+       console.log(n.get('A'));
+       console.log(n.delete("A")); //删除key
+       console.log(n.has('A'));
+       console.log(n.get('A')); //undefined
+       
+
+       function object_to_strmap (obj) {
+            let obj_keys = Object.keys(obj);                                     
+            console.log(obj_keys);
+            let strmap = new Map();
+            for (let item of obj_keys) {
+                strmap.set(item, obj[item]);
+            }
+            return strmap;
+        }
+
+        let obj = {name: 'js', age: 18}
+        object_to_strmap(obj);  // 返回值为 Map(2) {"name" => "js", "age" => 18}
 </script>
 </html>

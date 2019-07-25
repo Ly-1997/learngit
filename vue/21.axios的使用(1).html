@@ -17,7 +17,9 @@
         以$开头，$是在所有Vue实例中都可用的属性的一个简单约定，
         这样可以避免和已定义的数据、方法、计算属性等发生冲突
     */
-    Vue.prototype.$axios=axios;     
+    Vue.prototype.$axios=axios;   
+    console.log(this.$axios);
+      
     var App={
         template: '<button @click="sendRequest()">发请求</button>',
         methods: {

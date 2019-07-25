@@ -31,6 +31,8 @@
                 total: '',  //文件的总共大小
                 
                 goOnLoaded: 0,  //断点再请求时的请求数据量
+
+                fd: '',
             }
         },
         methods: {
@@ -40,12 +42,12 @@
                 let goOnFile=this.fileTwo.slice(this.currentLoaded,this.fileTwo.size);
                 console.log(goOnFile);
                 this.$axios.defaults.baseURL="http://127.0.0.1:8888/";
-                var fd=new FormData();
-                fd.append('aaa',goOnFile);  //append剩余数据部分
+                this.fd=new FormData();
+                this.fd.append('aaa',goOnFile);    //FormData().append(name,value,filename[可选])
                 let cancelToken=axios.CancelToken;
                 let source=cancelToken.source();
                 this.source=source;
-                this.$axios.post('upload',fd,{
+                this.$axios.post('upload',this.fd,{
                     cancelToken: source.token,
                     onUploadProgress: (progressEvent)=>{
                         this.goOnLoaded=progressEvent.loaded;   //另使用一个变量，保存断点续传的进度，以防第一次请求和断点请求相互影响
@@ -68,13 +70,13 @@
             },
             sendAjax() {
                 this.$axios.defaults.baseURL='http://127.0.0.1:8888';     //设置默认url前缀
-                var file=new FormData();
-                file.append('aaa',this.fileTwo);    //FormData().append(name,value,filename[可选])
+                this.fd=new FormData();
+                this.fd.append('aaa',this.fileTwo);    //FormData().append(name,value,filename[可选])
 
                 let cancelToken=axios.CancelToken;
                 let source=cancelToken.source();
                 this.source=source;
-                this.$axios.post('/upload',file,{
+                this.$axios.post('/upload',this.fd,{
                     cancelToken: source.token,
                     onUploadProgress: (progressEvent)=>{    //允许为上传处理进度事件
                         console.log(progressEvent.loaded,progressEvent.total);
