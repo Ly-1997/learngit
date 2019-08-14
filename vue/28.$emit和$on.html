@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>28.$emit和$on</title>
+</head>
+<body>
+    <div id="app">
+        <componenta></componenta>
+        <componentb></componentb>
+        <componentc></componentc>
+        <!-- <componentc></componentc> -->
+    </div>
+</body>
+<script src="./webpack/vue.min.js"></script>
+<script>
+    // $emit和$on的事件必须在一个公共的实例上，才能够触发
+    var VueCommon=new Vue(); //注册一个公共vue是咧，以便同级组件使用$emit和$on，来接收数据
+    let A={
+        template: `<div><span>A组件数据{{dataA}}</span><input type="button" value="A数据传给C数据" @click="send"></div>`,
+        data() {
+            return {
+                dataA: '这是组件A的数据'
+            }
+        },
+        methods: {
+            send() {
+                // $emit('事件名字',要传的数据);
+                // console.log(this);
+                console.log(VueCommon);
+                VueCommon.$emit('a-msg',this.dataA);
+            }
+        }
+    };
+    let B={
+        template: `<div><span>B组件数据{{dataB}}</span><input type="button" value="B数据传给C数据" @click="send"></div>`,
+        data() {
+            return {
+                dataB: '这是组件B的数据'
+            }
+        },
+        methods: {
+            send() {
+                // $emit('事件名字',要传的数据);
+                // console.log(this);   //此处this指向A组件
+                console.log(VueCommon);
+                VueCommon.$emit('b-msg',this.dataB);
+            }
+        }
+    };
+    let C={
+        template: `<div>
+                        <h3>这是C组件</h3>
+                        <span>接收a传来的数据：{{dataA}}</span>
+                        <br />
+                        <span>接收b传来的数据：{{dataB}}</span>
+                    </div>`,
+        // template: `<div><span>B组件数据{{dataB}}</span><input type="button" value="B数据传给C数据"></div>`,
+        data() {
+            return {
+                dataA:'',
+                dataB:''
+            }
+        },
+        mounted() {
+            // $on('事件名',fn);
+            VueCommon.$on('a-msg',(res)=>{
+                // console.log(res);
+                this.dataA=res;
+            });
+            VueCommon.$on('b-msg',(res)=>{
+                this.dataB=res;
+            });
+        }
+
+    }
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                
+            }
+        },
+        created() {
+            console.log(this);
+            console.log(Event);
+            
+        },
+        components: {
+            'componenta': A,
+            'componentb': B,
+            'componentc': C,
+            // 'componentc': C,
+        }
+    });
+    console.log(window.overall);
+    
+</script>
+</html>

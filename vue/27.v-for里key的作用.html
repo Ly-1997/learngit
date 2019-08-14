@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>27.v-for里key的作用</title>
+    <style>
+        body {
+            font-size: .875rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+</body>
+<script src="../webpack/node_modules/vue/dist/vue.min.js"></script>
+<script src="./lodash.min.js"></script>
+<script>
+    Vue.component('commonComp',{
+        template: '<div><h2>{{obj.id}}</h2><p>{{obj.name}}</p><p><input type="text" placeholder="请输入你的名字" /></p></div>',
+        props: {obj: Object}
+    });
+    let App={
+        data() {
+            return {
+                list: [{
+                    id: 1,name: 'aaa'
+                },{
+                    id: 2,name: 'bbb'
+                },{
+                    id: 3,name: 'ccc'
+                }]
+            }
+        },
+        template:  `<div>这是app根组件<button @click="changeSort">点击改变list顺序</button>
+            <commonComp v-for="(item,index) in list" :obj="item" :key="item.id"></commonComp></div>`,
+            // 将key和item.id绑定在一起，即是绑定了元素，使当列表次序发生改变时，输入框里的内容跟着变(key绑定item也行，但绑定index在这不行，私以为index可变)
+            // key最好绑定，且最好不绑定index，绑定id(可唯一标识的)
+        methods: {
+            changeSort() {
+                this.list=_.shuffle(this.list);
+                console.log(this.list);
+                
+            }
+        }
+    }
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+
+            }
+        },
+        template: '<App />',
+        components: {
+            App
+        }
+    });
+</script>
+</html>

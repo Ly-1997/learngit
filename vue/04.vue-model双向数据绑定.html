@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>04.vue-model双向数据绑定</title>
-    <script src="./node_modules/vue/dist/vue.min.js"></script>
+    <script src="../webpack/node_modules/vue/dist/vue.min.js"></script>
 </head>
 <body>
     <div id="app"></div>
@@ -14,7 +14,7 @@
             el: '#app',
             data() {    //es6匿名函数
                 return {
-                    msg: '双向数据绑定',
+                    msg: '双向数据绑定1111',
                 }
             },
             // v-model双向绑定只对表单标签，含“value”属性的标签有用，其原理是v-bind单向绑定和oninput事件结合，具体原理请查看defineProperty

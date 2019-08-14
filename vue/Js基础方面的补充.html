@@ -59,37 +59,351 @@
             如果要判断属性是否是自身所有，而非继承得到，可以用hasOwnProperty()方法，如obj.hasOwnProperty('age');
 
         （10）ES6引入了新数据类型Map，Map是一组键值对结构，有极快的查找速度
+
+        （11）set和map类似，是一组key的集合，但不存储value，且key不能重复，会剔除重复的key
+            eg: var s=new Set([1,2,3,3,'3']);
+                console.log(s); //[1,2,3,'3']
+        
+        （12）遍历Array可以采用下标循环，遍历Map和Set无法使用下标循环。为统一集合类型，ES6引入了新的iterable类型，Array、Map和Set都属于iterable类型
+             属于iterable类型的集合可以通过新的for...of循环来遍历
+
+        （13）for...in...  遍历的是对象的属性名称，Array其实也是对象，它每个元素的索引被视为一个属性
+            eg  var c=1;var arr=['a','b',c,'哈哈'];arr.name='哈哈';
+
+        （14）函数内部的语句一旦遇到return，就执行完毕，且返回结果。如果没有return，函数执行完毕后也返回结果，且结果为undefined
+
+        （15）JS内还有关键字arguments，只在函数内部作用，指向调用函数时传入的参数，其形似Array，但不是Array
+              arguments常用于判断传入参数的个数：
+              function abc(a,b,c) {
+                  console.log(arguments);
+                  
+                  if (arguments.length==2) {
+                      c=b;
+                      b=null;  //将b变为可选可配参数
+                  }
+                  console.log(a,b,c);
+              }
+              abc(1,2);
+        （16）ES6引入了rest参数，用于获取多余参数,
+              function testRest(a,b,...rest) {
+                  console.log(a,b);
+                  console.log(rest);
+              }
+              testRest(1,2,3,4,5);
+              testRest(1,2);
+              testRest(1);
+              testRest();
+                 rest参数只能写在最后面，前面用...标识，除了传入参数，多余参数以数组形式传入rest，不需要arguments我们就获取了所有参数
+                 如果传入实参的个数尚且不满所需形参，rest不为undefined，为[]，空数组
+
+        （17）JS引擎有在行末自动添加;机制
+              return
+                     a=0;
+              等同于
+              return;
+              a=0;
+
+        （18）Js默认有一个全局对象window，全局作用域的变量实际上被绑定到window的一个属性上
+                    var overall='这是全局变量';
+                    console.log(overall);
+                    console.log(window.overall);
+              最顶层函数的定义也被视为一个全局变量，并绑定到window上
+                    function foo(extra) {
+                        alert('这是外层函数'+extra);
+                    }
+                    foo('本身调用');
+                    window.foo('window调用');
+        
+        （19）ES6引入了新的关键字const来定义常量，const和let都有块级作用域，如const PI=3.14
+
+        （20）从ES6开始，JS引入了解构赋值，可以同时对一组变量进行赋值
+                 var [x,y,z]=['hello','js','web'];
+                 console.log('x='+x+' y='+y+' z='+z);
+             注：对元素进行解构赋值时，多个变量用[...]括起来
+                    如果数组本身有嵌套，可以通过下面的方式进行解构赋值，但注意嵌套层次和位置要一致
+                        let[x,[y,z]]=['解构赋值1',['解构赋值2','解构赋值3']];
+                        console.log('x='+x+' y='+y+' z='+z);
+                    解构赋值还可以忽略某些元素
+                        let[,,m]=[1,2,'aa'];
+                        console.log(m);
+                    如果需要从一个对象中取出若干属性，也可以使用解构赋值，便于快速获取指定属性
+                        var person={
+                            name: 'panda',
+                            age: 20,
+                            sex: 'woman',
+                            interests: ['novel','cartoon','music']
+                        }
+                        var {name,interests,sex}=person;     //name,interests,sex分别被赋值为对应属性
+                        console.log(name+'   '+interests+'   '+sex);
+                    对一个对象进行解构赋值时，同样可以对嵌套的对象属性进行解构赋值，只要保证层次一致
+                        var person={
+                            name: '我我我',
+                            gender: '女',
+                            age: 23,
+                            address: {
+                                country: 'China',
+                                province: 'Anhui',
+                                city: '芜湖',
+                                county: '南陵'
+                            }
+                        }
+                        var {name,age,address:{country,province}}=person;
+                        console.log(name+' '+age+' '+country+' '+province);
+                        console.log(address);   //这里的address不是变量，而只是为了让country、province获得person.address的属性
+
+        （21）function getAge() {
+                  var nowYear=new Date().getFullYear();
+                  console.log(this);
+                  return nowYear-this.birth;  //不要忘了方法内部有this变量，指向当前对象
+              }
+              var x={
+                  birth: 1997,
+                  name: 'liYa',
+                  age: getAge
+                  
+              }
+              console.log(x.age());
+              console.log(getAge());
+
+              // 'use strict';
+              // var y={
+              //     birth: 1997,
+              //     name: 'yali',
+              //     age: function () {
+              //         return new Date().getFullYear()-this.birth;
+              //     }
+              // }
+              // console.log(y.age());
+              // var fn = y.age;
+              // console.log(fn());// 'use strict':Uncaught TypeError: Cannot read property 'birth' of undefined;非'use strict'是NaN
+
+        （22）apply()方法是函数本身的方法，接收两个参数，第一个是需要绑定的this变量，第二个是数组、代表函数本身的参数
+              function getAge(a,b,c) {
+                  console.log(a,b,c);
+                  return new Date().getFullYear()-this.birth;
+              }
+              var z={
+                  name: 'aa',
+                  birth: 1997,
+                  age: getAge,
+              }
+              console.log(z.age());   //undefined undefined undefined 22
+              console.log(getAge.apply(z,[1,2,3]));    //1 2 3   22
+
+        （23）call()方法与apply()方法类似，不同的是call方法中的参数按顺序传入，apply方法中的参数则打成数组传入
+              console.log(Math.min.apply(null,[-9,10,2]));
+              console.log(Math.min.call(null,10,2,-9));   //普通函数调用，通常把this绑定为null
+
+        （24）一个函数能接收另一个函数作为参数，这个函数可称之高阶函数
+
+        （25）map()方法是数组方法，返回一个新数组，数组的元素为原始数组元素调用处理函数后返回的值
+              map()方法按照原始数组元素顺序依次处理元素
+              注：map()不会对空数组进行检测，map()不会改变原始数组
+              function plus(x) {
+                  return x*x;
+              }
+              let arr=[1,2,-3,-4.55,-9,9,88];
+              let results=arr.map(plus);  //map()传入的是plus，即函数对象本身
+              console.log(results);
+              console.log(results.map(String));
+
+        （26）reduce()方法是数组用的方法，Array的reduce方法把一个函数作用在这个数组的[x1,x2,x3...]上。该方法需要两个参数，
+              会计算出当前结果，并把结果和序列的下一个元素做累积运算
+              // function product(arr) {
+              //     let a=arr.reduce(function(x,y) {
+              //       return x*y;
+              //     });
+              //     return a;
+              // }
+              
+              // if (product([1, 2, 3, 4]) === 24 && product([0, 1, 2]) === 0 && product([99, 88, 77, 66]) === 44274384) {
+              //     console.log('测试通过!');
+              // }
+              // else {
+              //     console.log(product([1, 2, 3, 4]));
+              //     console.log(product([0, 1, 2]));
+              //     console.log(product([99, 88, 77, 66]));
+              //     console.log('测试失败!');
+              // }
+
+
+                map()和reduce()结合使用
+              // function normalize(arr) {
+              //     console.log(typeof(arr));
+              //     let a=arr.map(function(x){
+              //        let b=x.toLocaleUpperCase().substr(1);
+              //        b=b.toLocaleLowerCase();
+                     
+              //        return x.toLocaleUpperCase().substr(0,1)+b;
+              //     });
+              //     console.log(typeof(a));
+              //     console.log(a);
+              //     return a;
+              // }
+              
+              // // 测试:
+              // if (normalize(['adam', 'LISA', 'barT']).toString() === ['Adam', 'Lisa', 'Bart'].toString()) {
+              //     console.log('测试通过!');
+              // }
+              // else {
+              //     console.log('测试失败!');
+              // }
+
+        （27）filter();  用于把数组的某些元素过滤，返回剩下的元素
+              var arr=[1,2,3,4,5,6,7,8,9,0];
+              var newArr=arr.filter((x)=>{
+                  return x%2==0;
+              });
+              console.log(newArr);
+
+        （28）排序算法，通常规定：x<y，返回-1；x==y，返回0；x>y，返回1，sort()方法会对array进行修改，返回的结果仍是当前的array，具体比较可以自定义方法
+              var arr = [10, 20, 1, 2];
+              arr.sort(function (x, y) {
+                  if (x < y) {
+                      return 1;
+                  }
+                  if (x > y) {
+                      return -1;
+                  }
+                  return 0;
+              }); // [20, 10, 2, 1]
+
+        （29）Array相关部分方法：
+                every()判断数组的所有元素是否满足测试条件
+                    var arr = ['Apple', 'pear', 'orange'];
+                    console.log(arr.every(function (s) {
+                        return s.length > 0;
+                    })); // true, 因为每个元素都满足s.length>0
+
+                    console.log(arr.every(function (s) {
+                        return s.toLowerCase() === s;
+                    })); // false, 因为不是每个元素都全部是小写
+                find()方法用于查找符合条件的第一个元素，找到了返回这个元素，否则返回undefined
+                    var arr=['apple','Banana','Orange'];
+                    console.log(arr.find((s)=>{
+                        return s.toUpperCase()===s;
+                    }));
+                    console.log(arr.find((x)=>{
+                        return x.toLowerCase()===x;
+                    }));
+                findIndex()方法用于查找符合条件的第一个元素的索引，找到了返回索引，没找到返回-1
+                    var arr=['Banana','apple','Orange'];
+                    console.log(arr.findIndex((s)=>{
+                        return s.toUpperCase()===s;
+                    }));
+                    console.log(arr.findIndex((x)=>{
+                        return x.toLowerCase()===x;
+                    }));
+                forEach()和map()类似，也是把每个元素依次作用于传入的函数，但不会返回新数组，一般用来遍历数组
+                    var arr=['a',1,{b:999}];
+                    arr.forEach((item)=>{
+                        console.log(item);
+                    });
         */
-       
-       'use strict';
-       //    abc='ememememem';
-       //    console.log(abc);
+//         var c=1;var arr=['a','b',c,'哈哈'];arr.name='嗷嗷';
+//         for (const key in arr) {
+//             console.log(key,arr[key]);  //(0,1,2,3,'name')
+//         }
+//        'use strict';
+//        //    abc='ememememem';
+//        //    console.log(abc);
     
-       //  初始化Map需要一个二维数组
-       var m=new Map([['xiaoMing',90],['xiaoHong',80],['xiaoHuang',70]]);
-       console.log(m.get('xiaoHuang'));
-       //  或者直接初始化空Map
-       var n=new Map();
-       n.set('A',80);   //添加键值，key———value
-       n.set('B',100);
-       console.log(n.has('A')); //是否存在Key， has(Key)
-       console.log(n.get('A'));
-       console.log(n.delete("A")); //删除key
-       console.log(n.has('A'));
-       console.log(n.get('A')); //undefined
+//        //  初始化Map需要一个二维数组
+//        var m=new Map([['xiaoMing',90],['xiaoHong',80],['xiaoHuang',70]]);
+//        console.log(m.get('xiaoHuang'));
+//        //  或者直接初始化空Map
+//        var n=new Map();
+//        n.set('A',80);   //添加键值，key———value
+//        n.set('B',100);
+//        console.log(n.has('A')); //是否存在Key， has(Key)
+//        console.log(n.get('A'));
+//        console.log(n.delete("A")); //删除key
+//        console.log(n.has('A'));
+//        console.log(n.get('A')); //undefined
        
 
-       function object_to_strmap (obj) {
-            let obj_keys = Object.keys(obj);                                     
-            console.log(obj_keys);
-            let strmap = new Map();
-            for (let item of obj_keys) {
-                strmap.set(item, obj[item]);
-            }
-            return strmap;
-        }
+//        function object_to_strmap (obj) {
+//             let obj_keys = Object.keys(obj);                                     
+//             console.log(obj_keys);
+//             let strmap = new Map();
+//             for (let item of obj_keys) {
+//                 strmap.set(item, obj[item]);
+//             }
+//             return strmap;
+//         }
 
-        let obj = {name: 'js', age: 18}
-        object_to_strmap(obj);  // 返回值为 Map(2) {"name" => "js", "age" => 18}
+//         let obj = {name: 'js', age: 18}
+//         object_to_strmap(obj);  // 返回值为 Map(2) {"name" => "js", "age" => 18}
+
+//         var s=new Set([1,2,3,3,2,'3']);
+//         s.add(4);   //通过add(key)可以添加元素到set中，可以重复添加，但不会有效果
+//         s.delete(1);    // 通过delete(key)方法可以在set中删除元素
+//         console.log(s); //[1,2,3,'3']
+//         // s.forEach(element => {
+//         //     console.log(element);
+            
+//         // });
+//         for (const iter of s) {
+//             console.log(iter);
+            
+//         }
+//         // m.forEach(element => {
+//         //     console.log(element);
+            
+//         // });
+//         for (const iter of m) {
+//             console.log(iter,iter[0],iter[1]);
+//         }
+//         var Arr=[1,2,3,4,5,6,'aaa','bbb',{c:'哈哈'}];
+//         for (const iter of Arr) {
+//             console.log(iter);
+            
+//         }
+
+//         function abs(x) {
+//     if (typeof x !== 'number') {
+//         throw 'Not a number';
+//     }
+//     for (let i = 0; i < arguments.length; i++) {
+//         console.log(arguments[i]);
+        
+//     }
+//     if (x >= 0) {
+//         return x;
+//     } else {
+//         return -x;
+//     }
+// }
+// abs(10,30,'a');
+
+
+
+
+// function string2int(s) {
+//     // console.log(s.split());
+//     let newArr=s.split('');
+//     newArr=newArr.map(function (x) {
+//         return x*1;
+//     })
+//     let a=newArr.reduce(function(x,y) {
+//         return x*10+y;
+//     });
+//     return a;
+    
+// }
+// // 测试:
+// if (string2int('0') === 0 && string2int('12345') === 12345 && string2int('12300') === 12300) {
+//     if (string2int.toString().indexOf('parseInt') !== -1) {
+//         console.log('请勿使用parseInt()!');
+//     } else if (string2int.toString().indexOf('Number') !== -1) {
+//         console.log('请勿使用Number()!');
+//     } else {
+//         console.log('测试通过!');
+//     }
+// }
+// else {
+//     console.log('测试失败!');
+// }
+
 </script>
 </html>
